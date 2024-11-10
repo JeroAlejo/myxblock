@@ -1,5 +1,6 @@
 """TO-DO: Write a description of what this XBlock is."""
 
+import importlib
 import pkg_resources
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -33,6 +34,24 @@ class MyXBlock(XBlock):
         """
         html = self.resource_string("static/html/myxblock.html")
         frag = Fragment(html.format(self=self))
+
+
+        css_str = importlib.resources.files(__package__).joinpath("static/quill/quill.snow.css").read_text(encoding="utf-8")
+        frag.add_css(str(css_str))
+
+        #Carga de archivo JS para Studio (EpnXBlockStudio)
+        js_str = importlib.resources.files(__package__).joinpath("static/quill/quill.js").read_text(encoding="utf-8")
+        frag.add_javascript(str(js_str))
+
+        # Inicializa Quill en el JS de tu XBlock
+        frag.add_javascript('''
+            (function() {
+            var quill = new Quill('#editor-container', {
+                theme: 'snow'
+            });
+            })();
+        ''')
+
         frag.add_css(self.resource_string("static/css/myxblock.css"))
         frag.add_javascript(self.resource_string("static/js/src/myxblock.js"))
         frag.initialize_js('MyXBlock')
